@@ -1,0 +1,59 @@
+name: Python
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # so that NerdBank.GitVersioning has access to history
+    - name: Install Nix
+      uses: cachix/install-nix-action@v26
+      with:
+        extra_nix_config: |
+          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+    - name: Create venv
+      run: nix develop --command python -m venv .venv --system-site-packages
+    - name: Install
+      run: nix develop --command ./.venv/bin/python -m pip install -r requirements.txt
+    - name: Build
+      run: nix develop --command .venv/bin/manim -ql thing.py
+
+  check-nix-format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Nix
+        uses: cachix/install-nix-action@v26
+        with:
+          extra_nix_config: |
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+      - name: Run Alejandra
+        run: nix develop --command alejandra --check .
+
+  linkcheck:
+    name: Check links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Install Nix
+        uses: cachix/install-nix-action@v26
+        with:
+          extra_nix_config: |
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+      - name: Run link checker
+        run: nix develop --command markdown-link-check README.md
+
+  all-required-checks-complete:
+    needs: [check-nix-format, build, linkcheck]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "All required checks complete."
