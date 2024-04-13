@@ -23,6 +23,8 @@ jobs:
       run: nix develop --command python -m venv .venv --system-site-packages
     - name: Install
       run: nix develop --command ./.venv/bin/python -m pip install -r requirements.txt
+    - name: Pyright
+      run: nix develop --command pyright --pythonpath ./.venv/bin/python thing.py
     - name: Build
       run: nix develop --command .venv/bin/manim -ql thing.py
 
