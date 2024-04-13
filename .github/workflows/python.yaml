@@ -24,9 +24,9 @@ jobs:
     - name: Install
       run: nix develop --command ./.venv/bin/python -m pip install -r requirements.txt
     - name: Pyright
-      run: nix develop --command pyright --pythonpath ./.venv/bin/python thing.py
+      run: nix develop --command pyright --pythonpath ./.venv/bin/python diagram.py
     - name: Build
-      run: nix develop --command .venv/bin/manim -ql thing.py
+      run: nix develop --command .venv/bin/manim -ql diagram.py
 
   check-nix-format:
     runs-on: ubuntu-latest
