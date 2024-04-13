@@ -170,6 +170,7 @@
               pkgs.nodePackages.markdown-link-check
               pkgs.alejandra
               manim-tinytex
+              pkgs.pyright
             ];
         };
       }
